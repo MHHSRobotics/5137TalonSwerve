@@ -20,14 +20,14 @@ import frc.robot.Subsystems.Swerve;
 
 public class RobotContainer {
 
-  private final CommandPS4Controller driverController;
+  private final CommandXboxController driverController;
   private final CommandPS4Controller operatorController;
   private final Swerve swerveSubsystem;
   private final Swerve_Commands swerve_Commands;
 
 
   public RobotContainer() {
-    driverController = new CommandPS4Controller(0);
+    driverController = new CommandXboxController(0);
     operatorController = new CommandPS4Controller(1);
 
     /*Register NamedCommands before creating swerve  */
@@ -38,7 +38,7 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    Trigger leftBumper = driverController.L1();
+    Trigger leftBumper = driverController.leftBumper();
 
     swerveSubsystem.setDefaultCommand(swerve_Commands.drive(
       () -> getAllianceInvert()*MathUtil.applyDeadband(-driverController.getLeftY(), Swerve_Constants.LY_Deadband),
@@ -47,8 +47,11 @@ public class RobotContainer {
       () -> !leftBumper.getAsBoolean()
     ));
 
-    driverController.triangle()
+    driverController.y()
     .onTrue(swerve_Commands.zeroGyro());
+
+    driverController.a()
+    .onTrue(swerve_Commands.lockSwerve());
 
   }
 

@@ -33,6 +33,10 @@ public class Swerve_Commands {
         return new InstantCommand(() -> swerve.zeroGyro(), swerve);
     }
 
+    public InstantCommand lockSwerve(){
+        return new InstantCommand(() -> swerve.lock(), swerve);
+    }
+
     public Command runAuto() {
         return swerve.getAuto();
     }
