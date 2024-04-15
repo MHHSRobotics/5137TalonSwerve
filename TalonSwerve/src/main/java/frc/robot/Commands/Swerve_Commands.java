@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.Swerve_Constants;
 import frc.robot.Subsystems.Swerve;
@@ -35,6 +36,10 @@ public class Swerve_Commands {
 
     public InstantCommand lockSwerve(){
         return new InstantCommand(() -> swerve.lock(), swerve);
+    }
+
+    public FunctionalCommand driveToNote(DoubleSupplier distanceToNote, DoubleSupplier rotationToNote) {
+        return new FunctionalCommand(() -> {}, () -> swerve.driveToNote(rotationToNote.getAsDouble(), distanceToNote.getAsDouble()), (Boolean x) -> {}, () -> swerve.notePickUpComplete(), swerve);
     }
 
     public Command runAuto() {

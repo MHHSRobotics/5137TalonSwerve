@@ -15,13 +15,18 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Commands.Swerve_Commands;
+import frc.robot.Commands.Vision_Commands;
 import frc.robot.Constants.Swerve_Constants;
-import frc.robot.Subsystems.Swerve;
+import frc.robot.Subsystems.*;
 
 public class RobotContainer {
 
   private final CommandXboxController driverController;
   private final CommandPS4Controller operatorController;
+  
+  private final Vision visionSubsystem;
+  private final Vision_Commands vision_Commands;
+  
   private final Swerve swerveSubsystem;
   private final Swerve_Commands swerve_Commands;
 
@@ -30,6 +35,10 @@ public class RobotContainer {
     driverController = new CommandXboxController(0);
     operatorController = new CommandPS4Controller(1);
 
+   
+    visionSubsystem = new Vision();
+    vision_Commands = new Vision_Commands(visionSubsystem);
+   
     /*Register NamedCommands before creating swerve  */
     swerveSubsystem = new Swerve(new File(Filesystem.getDeployDirectory(),"swerve"));
     swerve_Commands = new Swerve_Commands(swerveSubsystem);
@@ -52,6 +61,9 @@ public class RobotContainer {
 
     driverController.a()
     .onTrue(swerve_Commands.lockSwerve());
+
+    driverController.b()
+    .onTrue(swerve_Commands.driveToNote(()-> visionSubsystem.getMetersToNote(),()-> visionSubsystem.getTranslationToNote().getAngle().getRadians()));
 
   }
 

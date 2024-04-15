@@ -9,6 +9,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Swerve_Constants;
+import frc.robot.Constants.Vision_Constants;
 import swervelib.SwerveDrive;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -29,7 +31,16 @@ public class Swerve extends SubsystemBase{
     private final SwerveDrive swerveDrive;
     private SendableChooser<Command> autoChooser;
 
+    private PIDController objectDistanceController;
+    private PIDController objectYawController;
+
     public Swerve(File directory){
+
+        objectDistanceController = new PIDController(Vision_Constants.objectDistanceKP, Vision_Constants.objectDistanceKI, Vision_Constants.objectDistanceKD);
+        objectDistanceController.setTolerance(Vision_Constants.allowableDistanceError);
+        objectYawController = new PIDController(Vision_Constants.objectYawKP, Vision_Constants.objectYawKI, Vision_Constants.objectYawKD);
+        objectYawController.setTolerance(Vision_Constants.allowableRotationError);
+
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
         try{
             swerveDrive = new SwerveParser(directory).createSwerveDrive(Swerve_Constants.maxSpeed);
@@ -108,6 +119,18 @@ public class Swerve extends SubsystemBase{
 
     public boolean isRedAlliance(){
         return DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() == DriverStation.Alliance.Red : false; 
+    }
+
+    public boolean notePickUpComplete(){
+        return objectYawController.atSetpoint() && objectDistanceController.atSetpoint(); 
+    }
+
+    public void driveToNote(double radiansToNote, double metersToNote){
+       
+        double distance = metersToNote;
+        double turnVelocity = objectYawController.calculate(radiansToNote,0);
+        double driveVelocity = objectDistanceController.calculate(distance, Vision_Constants.notePickupDistance);
+        drive(new Translation2d(driveVelocity, 0), turnVelocity, false);
     }
 
 }
