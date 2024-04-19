@@ -5,7 +5,7 @@ public class Swerve_Constants {
     public static final double maxSpeed = 4.8;
 
     /** Max linear speed of each swerve module in m/s */
-    public static final double maxModuleSpeed = 4.5;
+    public static final double maxModuleSpeed = 4.8;
     
     /** Max angular speed of therobot in m/s */
     public static final double maxAngularSpeed = 10.0;
